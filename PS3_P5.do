@@ -2,6 +2,7 @@
 global path "/Users/adrienroussetplanat/Dropbox/PhD/Courses/Econometrics_I/PS/"
 cd "$path"
 clear all
+log using log_P3Q5_RoussetPlanat.log, replace
 import excel "PS4data.xlsx",cellrange(A1) firstrow
 
 gen date = yq(year, quarter)
@@ -31,6 +32,8 @@ reg lnconsump lny e,robust
 gen residuals=lnconsump-.0026129-0.4369273*lny
 reg residuals l(2/5).lnconsump
 
+
+log close
 
 
 
