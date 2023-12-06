@@ -1,0 +1,249 @@
+----------------------------------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  /Users/adrienroussetplanat/Library/CloudStorage/Dropbox/PhD/Courses/Econometrics_I/PS/log_P4_
+> RoussetPlanat.log
+  log type:  text
+ opened on:   5 Dec 2023, 18:54:55
+
+. 
+. //Problem 2
+. use ccapm,clear
+
+. 
+. gen cratio_lag = cratio[_n-1]
+(1 missing value generated)
+
+. gen rrate_lag = rrate[_n-1]
+(1 missing value generated)
+
+. gen e_lag = e[_n-1]
+(1 missing value generated)
+
+. 
+. //(a)
+. gmm ({b=1}*(cratio^(-{g=1}))*rrate-1), inst(cratio_lag rrate_lag e_lag)
+
+Step 1
+Iteration 0:   GMM criterion Q(b) =   .0000144  
+Iteration 1:   GMM criterion Q(b) =  .00001312  
+Iteration 2:   GMM criterion Q(b) =  .00001312  
+
+Step 2
+Iteration 0:   GMM criterion Q(b) =  .00603693  
+Iteration 1:   GMM criterion Q(b) =  .00534195  
+Iteration 2:   GMM criterion Q(b) =  .00534195  
+
+GMM estimation 
+
+Number of parameters =   2
+Number of moments    =   4
+Initial weight matrix: Unadjusted                 Number of obs   =        237
+GMM weight matrix:     Robust
+
+------------------------------------------------------------------------------
+             |               Robust
+             |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+          /b |   .9976933   .0043145   231.24   0.000      .989237     1.00615
+          /g |   .7144645   1.760412     0.41   0.685    -2.735879    4.164808
+------------------------------------------------------------------------------
+Instruments for equation 1: cratio_lag rrate_lag e_lag _cons
+
+. 
+. //(b)
+. 
+. gen time = _n
+
+. 
+. gmm ({b=1}*(cratio^(-{g=1}))*rrate-1), inst(cratio_lag rrate_lag e_lag) wmatrix(hac ba 5)
+
+Step 1
+Iteration 0:   GMM criterion Q(b) =   .0000144  
+Iteration 1:   GMM criterion Q(b) =  .00001312  
+Iteration 2:   GMM criterion Q(b) =  .00001312  
+
+Step 2
+Iteration 0:   GMM criterion Q(b) =  .00840257  
+Iteration 1:   GMM criterion Q(b) =  .00785394  
+Iteration 2:   GMM criterion Q(b) =  .00785394  
+
+GMM estimation 
+
+Number of parameters =   2
+Number of moments    =   4
+Initial weight matrix: Unadjusted                 Number of obs   =        237
+GMM weight matrix:     HAC Bartlett 5
+
+------------------------------------------------------------------------------
+             |                 HAC
+             |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+          /b |    .997831    .004389   227.35   0.000     .9892288    1.006433
+          /g |   .7768128   1.765982     0.44   0.660    -2.684449    4.238074
+------------------------------------------------------------------------------
+HAC standard errors based on Bartlett kernel with 5 lags.
+Instruments for equation 1: cratio_lag rrate_lag e_lag _cons
+
+. 
+. //Problem 4
+. use MURDER,clear
+
+. //(a)
+. reg mrdrte exec unem d90 d93
+
+      Source |       SS           df       MS      Number of obs   =       153
+-------------+----------------------------------   F(4, 148)       =      3.05
+       Model |  977.390644         4  244.347661   Prob > F        =    0.0190
+    Residual |  11867.9475       148  80.1888343   R-squared       =    0.0761
+-------------+----------------------------------   Adj R-squared   =    0.0511
+       Total |  12845.3381       152  84.5088034   Root MSE        =    8.9548
+
+------------------------------------------------------------------------------
+      mrdrte |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+        exec |   .1627547   .1939295     0.84   0.403    -.2204738    .5459832
+        unem |   1.390786   .4508653     3.08   0.002     .4998207    2.281751
+         d90 |   2.675335   1.816934     1.47   0.143      -.91515     6.26582
+         d93 |   1.607317   1.774768     0.91   0.367    -1.899842    5.114476
+       _cons |  -1.864393   3.069517    -0.61   0.545    -7.930134    4.201349
+------------------------------------------------------------------------------
+
+. 
+. //(b)
+. xtset id year
+       panel variable:  id (strongly balanced)
+        time variable:  year, 87 to 93, but with gaps
+                delta:  1 unit
+
+. xtreg mrdrte exec unem d90 d93, fe
+
+Fixed-effects (within) regression               Number of obs     =        153
+Group variable: id                              Number of groups  =         51
+
+R-sq:                                           Obs per group:
+     within  = 0.0734                                         min =          3
+     between = 0.0037                                         avg =        3.0
+     overall = 0.0108                                         max =          3
+
+                                                F(4,98)           =       1.94
+corr(u_i, Xb)  = 0.0010                         Prob > F          =     0.1098
+
+------------------------------------------------------------------------------
+      mrdrte |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+        exec |  -.1383231   .1770059    -0.78   0.436    -.4895856    .2129395
+        unem |   .2213158   .2963756     0.75   0.457     -.366832    .8094636
+         d90 |   1.556215   .7453273     2.09   0.039     .0771369    3.035293
+         d93 |   1.733242   .7004381     2.47   0.015     .3432454    3.123239
+       _cons |   5.822104   1.915611     3.04   0.003     2.020636    9.623572
+-------------+----------------------------------------------------------------
+     sigma_u |  8.7527226
+     sigma_e |  3.5214244
+         rho |  .86068589   (fraction of variance due to u_i)
+------------------------------------------------------------------------------
+F test that all u_i=0: F(50, 98) = 17.18                     Prob > F = 0.0000
+
+. 
+. mat betafe=get(_b)
+
+. mat Vfe=get(VCE)
+
+. 
+. //(c)
+. xi: qui reg mrdrte i.id
+i.id              _Iid_1-51           (naturally coded; _Iid_1 omitted)
+
+. predict rmrdrte, residuals
+
+. xi: qui reg exec i.id
+i.id              _Iid_1-51           (naturally coded; _Iid_1 omitted)
+
+. predict rexec, residuals
+
+. xi: qui reg unem i.id
+i.id              _Iid_1-51           (naturally coded; _Iid_1 omitted)
+
+. predict runem, residuals
+
+. xi: qui reg d90 i.id
+i.id              _Iid_1-51           (naturally coded; _Iid_1 omitted)
+
+. predict rd90, residuals
+
+. xi: qui reg d93 i.id
+i.id              _Iid_1-51           (naturally coded; _Iid_1 omitted)
+
+. predict rd93, residuals
+
+. 
+. reg rmrdrte rexec runem rd90 rd93, noconstant
+
+      Source |       SS           df       MS      Number of obs   =       153
+-------------+----------------------------------   F(4, 149)       =      2.95
+       Model |  96.2178837         4  24.0544709   Prob > F        =    0.0221
+    Residual |  1215.24215       149  8.15598758   R-squared       =    0.0734
+-------------+----------------------------------   Adj R-squared   =    0.0485
+       Total |  1311.46003       153  8.57163421   Root MSE        =    2.8559
+
+------------------------------------------------------------------------------
+     rmrdrte |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+       rexec |  -.1383231   .1435515    -0.96   0.337    -.4219827    .1453366
+       runem |   .2213158   .2403601     0.92   0.359    -.2536389    .6962706
+        rd90 |   1.556215   .6044591     2.57   0.011     .3617955    2.750634
+        rd93 |   1.733242   .5680541     3.05   0.003     .6107597    2.855724
+------------------------------------------------------------------------------
+
+. 
+. //(d)
+. xtreg mrdrte exec unem d90 d93
+
+Random-effects GLS regression                   Number of obs     =        153
+Group variable: id                              Number of groups  =         51
+
+R-sq:                                           Obs per group:
+     within  = 0.0680                                         min =          3
+     between = 0.0731                                         avg =        3.0
+     overall = 0.0426                                         max =          3
+
+                                                Wald chi2(4)      =       8.52
+corr(u_i, X)   = 0 (assumed)                    Prob > chi2       =     0.0743
+
+------------------------------------------------------------------------------
+      mrdrte |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+        exec |  -.0543375   .1595008    -0.34   0.733    -.3669533    .2582784
+        unem |   .3947507   .2848133     1.39   0.166    -.1634732    .9529745
+         d90 |   1.732981   .7478556     2.32   0.020     .2672106     3.19875
+         d93 |   1.699913   .7065606     2.41   0.016     .3150796    3.084746
+       _cons |   4.635132   2.179451     2.13   0.033     .3634863    8.906778
+-------------+----------------------------------------------------------------
+     sigma_u |  8.2056677
+     sigma_e |  3.5214244
+         rho |  .84447636   (fraction of variance due to u_i)
+------------------------------------------------------------------------------
+
+. mat betare = get(_b)
+
+. mat Vre = get(VCE)
+
+. 
+. //Hausman:
+. mat hausman=(betafe[1,1..4]-betare[1,1..4])*invsym(Vfe[1..4,1..4]-Vre[1..4,1..4])*(betafe[1,1..4]-betare
+> [1,1..4])'
+
+. mat list hausman
+
+symmetric hausman[1,1]
+          y1
+y1  5.775724
+
+. 
+. 
+. log close
+      name:  <unnamed>
+       log:  /Users/adrienroussetplanat/Library/CloudStorage/Dropbox/PhD/Courses/Econometrics_I/PS/log_P4_
+> RoussetPlanat.log
+  log type:  text
+ closed on:   5 Dec 2023, 18:54:55
+----------------------------------------------------------------------------------------------------------
